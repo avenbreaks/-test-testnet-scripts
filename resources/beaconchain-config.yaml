@@ -9,8 +9,8 @@ database:
 chain:
   slotsPerEpoch: 32
   secondsPerSlot: 12
-  genesisTimestamp: ${GENESIS_TIMESTAMP}
-  minGenesisActiveValidatorCount: ${MIN_GENESIS_VALIDATORS}
+  genesisTimestamp: 1680332778
+  minGenesisActiveValidatorCount: 64
   mainnet: false
   phase0path: /config_testnet/config.yaml
   altairForkEpoch: 0
