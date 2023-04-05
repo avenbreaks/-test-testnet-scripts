@@ -1,6 +1,6 @@
 #!/bin/bash
 
-genesis_repository="avenbreaks/-test-testnet-scripts"
+genesis_repository="avenbreaks/test-testnet-repos"
 testnet_dir="/data/testnet"
 el_datadir="/data/geth-data"
 cl_datadir="/data/lh-data"

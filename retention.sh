@@ -1,6 +1,7 @@
 #!/bin/bash
 
-genesis_repository="avenbreaks/-test-testnet-scripts"
+genesis_repository="
+avenbreaks/test-testnet-repos"
 testnet_dir=/home/etherum/testnet
 el_datadir=/home/etherum/data-geth
 cl_datadir=/home/etherum/data-lh
