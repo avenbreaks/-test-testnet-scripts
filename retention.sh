@@ -4,7 +4,7 @@ genesis_repository="avenbreaks/test-testnet-repos"
 testnet_dir=/home/etherum/testnet
 el_datadir=/home/etherum/data-geth
 cl_datadir=/home/etherum/data-lh
-cl_port=5052
+cl_port=5053
 
 
 start_clients() {
@@ -12,6 +12,7 @@ start_clients() {
   echo "start clients"
   sudo /bin/systemctl start geth
   sudo /bin/systemctl start beacon-chain
+  sudo /bin/systemctl start beacon
   sudo /bin/systemctl start validator
 }
 
@@ -20,6 +21,7 @@ stop_clients() {
   echo "stop clients"
   sudo /bin/systemctl stop geth
   sudo /bin/systemctl stop beacon-chain
+  sudo /bin/systemctl stop beacon
   sudo /bin/systemctl stop validator
 }
 

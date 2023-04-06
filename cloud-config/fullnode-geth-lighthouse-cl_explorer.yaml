@@ -19,22 +19,15 @@ packages:
   - lsb-release
 users:
   - name: pk910
-    groups: sudo
+    primary-group: users
     shell: /bin/bash
     uid: "1000"
-    sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh-authorized-keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDHpTpwf+2WYTnxXy0V8oTvbP6B+vKn5hbZDlmgZaFtlQpDTQyMaxZ3qs+ORXkwDcS0+/mFXSYR2ifMvbWn8c7F5Wsf4kqQmxmy9SEamNnMrFVb30LlVsKurCZaFiOuSPXNbsTmHduoKGtNIi+Xlldq98sDp0splNekVcQP+r9FvGN4lksr6nmsR60pFBjgoKqMdRe9g1kkbMjmnCMidTwhqb01BjuByhlVEww8eMi4K8VXHATTSUG0ET+dp2UHhpXEpGv7uwWmxO72RhHJml4PmxxIZXhroYs9cknveRNvJ5xZZ0rN1vqEKXY9FngVL/fkxfz0unx4/K8gUc1JLKDVZqHzGOx88QcSkU8zJNEh1CDQksignFLlbbNdZXbhmHEfhvz8k/Hkgc5UDuRmhg5w3XKABX4u12buB3wadAxjzxPuSNfGLSXcwawmTnf33qB27wMrS/5lBxSSJDt6ZYkkXDva3CzukQSQDtnUhrRbvrBD1PbsBSfeF/E4+0sEkmU= avenbreaks@pop-os
   - name: etherum
     home: /home/etherum
     shell: /bin/bash
-    sudo: ['ALL=(ALL) NOPASSWD:ALL']
     uid: "1001"
-  - name: beaconchain
-    home: /home/beaconchain
-    shell: /bin/bash
-    sudo: ['ALL=(ALL) NOPASSWD:ALL']
-    uid: "1003"
 write_files:
   - path: /etc/ssh/sshd_config.d/pknet-ssh.conf
     content: |
@@ -42,10 +35,14 @@ write_files:
   - path: /etc/sudoers.d/pk910
     content: |
       pk910    ALL=(ALL) NOPASSWD: ALL
+  - path: /etc/sudoers.d/pk910
+    content: |
+      # User privilege specification
+      pk910    ALL=(ALL) NOPASSWD: ALL
   - path: /etc/sudoers.d/etherum
     content: |
       # Cmnd alias specification
-      Cmnd_Alias ETH_CMDS = /bin/systemctl stop geth, /bin/systemctl start geth, /bin/systemctl stop beacon-chain, /bin/systemctl start beacon-chain, /bin/systemctl stop validator, /bin/systemctl start validator, /bin/systemctl stop boot-node, /bin/systemctl start boot-node, /home/beaconchain/start.sh, /home/beaconchain/stop.sh, /home/beaconchain/reset.sh, /root/reset-beaconchain-db.sh
+      Cmnd_Alias ETH_CMDS = /bin/systemctl stop geth, /bin/systemctl start geth, /bin/systemctl stop beacon-chain, /bin/systemctl start beacon-chain, /bin/systemctl stop beacon, /bin/systemctl start beacon, /bin/systemctl stop validator, /bin/systemctl start validator, /bin/systemctl stop boot-node, /bin/systemctl start boot-node, /home/beaconchain/start.sh, /home/beaconchain/stop.sh, /home/beaconchain/reset.sh, /root/reset-beaconchain-db.sh
 
       # User privilege specification
       etherum    ALL=(ALL) NOPASSWD: ETH_CMDS
@@ -76,7 +73,23 @@ write_files:
       User            = etherum
       WorkingDirectory= /home/etherum/lighthouse
       EnvironmentFile = /home/etherum/testnet/nodevars_env.txt
-      ExecStart       = /home/etherum/lighthouse/lighthouse bn --testnet-dir /home/etherum/testnet --datadir /home/etherum/data-lh --staking --metrics --port 9010 --http-address 0.0.0.0 --metrics-address 0.0.0.0 --execution-endpoint http://127.0.0.1:8551 --execution-jwt="/home/etherum/jwtsecret" --boot-nodes ${BOOTNODE_ENR_LIST}
+      ExecStart       = /home/etherum/lighthouse/lighthouse bn --testnet-dir /home/etherum/testnet --datadir /home/etherum/data-lh --staking --metrics --port 9010 --http-address 0.0.0.0 --metrics-address 0.0.0.0 --http-port 5052 --enr-udp-port=9000 --enr-tcp-port=9000 --discovery-port=9000 --port 9000 --execution-endpoint http://127.0.0.1:8551 --execution-jwt="/home/etherum/jwtsecret" --boot-nodes ${BOOTNODE_ENR_LIST}
+      Restart         = on-failure
+
+      [Install]
+      WantedBy= multi-user.target
+  - path: /etc/systemd/system/beacon.service
+    content: |
+      [Unit]
+      Description     = eth2 beacon chain service
+      Wants           = network-online.target
+      After           = network-online.target
+
+      [Service]
+      User            = etherum
+      WorkingDirectory= /home/etherum/lighthouse
+      EnvironmentFile = /home/etherum/testnet/nodevars_env.txt
+      ExecStart       = /home/etherum/lighthouse/lighthouse bn --testnet-dir /home/etherum/testnet --datadir /home/etherum/data-lh1 --staking --metrics --port 9010 --http-address 0.0.0.0 --metrics-address 0.0.0.0 --http-port 5053 --enr-udp-port=9001 --enr-tcp-port=9001 --discovery-port=9001 --port 9001 --execution-endpoint http://127.0.0.1:8551 --execution-jwt="/home/etherum/jwtsecret" --boot-nodes ${BOOTNODE_ENR_LIST}
       Restart         = on-failure
 
       [Install]
@@ -91,7 +104,7 @@ write_files:
       [Service]
       User            = etherum
       WorkingDirectory= /home/etherum/lighthouse
-      ExecStart       = /home/etherum/lighthouse/lighthouse vc --testnet-dir /home/etherum/testnet --datadir /home/etherum/data-lh --beacon-nodes "http://localhost:5052" --graffiti "Gitshock-Labs" --suggested-fee-recipient 0x14627ea0e2B27b817DbfF94c3dA383bB73F8C30b --init-slashing-protection --allow-unsynced
+      ExecStart       = /home/etherum/lighthouse/lighthouse vc --testnet-dir /home/etherum/testnet --datadir /home/etherum/data-lh --beacon-nodes "http://localhost:5053" --graffiti "Gitshock-Labs" --suggested-fee-recipient 0x9adddA86C9479C45bD145BBa9FC28146FdF46C83 --init-slashing-protection --allow-unsynced
       Restart         = on-failure
 
       [Install]
@@ -140,7 +153,7 @@ write_files:
       testnet_dir=/home/etherum/testnet
       el_datadir=/home/etherum/data-geth
       cl_datadir=/home/etherum/data-lh
-      cl_port=5052
+      cl_port=5053
 
 
       start_clients() {
