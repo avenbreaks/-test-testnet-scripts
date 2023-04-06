@@ -19,23 +19,26 @@ packages:
   - lsb-release
 users:
   - name: pk910
-    primary-group: users
+    groups: sudo
     shell: /bin/bash
     uid: "1000"
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh-authorized-keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDHpTpwf+2WYTnxXy0V8oTvbP6B+vKn5hbZDlmgZaFtlQpDTQyMaxZ3qs+ORXkwDcS0+/mFXSYR2ifMvbWn8c7F5Wsf4kqQmxmy9SEamNnMrFVb30LlVsKurCZaFiOuSPXNbsTmHduoKGtNIi+Xlldq98sDp0splNekVcQP+r9FvGN4lksr6nmsR60pFBjgoKqMdRe9g1kkbMjmnCMidTwhqb01BjuByhlVEww8eMi4K8VXHATTSUG0ET+dp2UHhpXEpGv7uwWmxO72RhHJml4PmxxIZXhroYs9cknveRNvJ5xZZ0rN1vqEKXY9FngVL/fkxfz0unx4/K8gUc1JLKDVZqHzGOx88QcSkU8zJNEh1CDQksignFLlbbNdZXbhmHEfhvz8k/Hkgc5UDuRmhg5w3XKABX4u12buB3wadAxjzxPuSNfGLSXcwawmTnf33qB27wMrS/5lBxSSJDt6ZYkkXDva3CzukQSQDtnUhrRbvrBD1PbsBSfeF/E4+0sEkmU= avenbreaks@pop-os
   - name: etherum
     home: /home/etherum
     shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
     uid: "1001"
   - name: beaconchain
     home: /home/beaconchain
     shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
     uid: "1003"
 write_files:
   - path: /etc/ssh/sshd_config.d/pknet-ssh.conf
     content: |
-      Port 16110
+      Port 22
   - path: /etc/sudoers.d/pk910
     content: |
       pk910    ALL=(ALL) NOPASSWD: ALL
