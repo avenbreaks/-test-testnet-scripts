@@ -44,8 +44,7 @@ The testnet rolls back to genesis every two days. Rollback is automated via a Cr
 | ephemery.image.repository | string | `"nixery.dev/shell/gnutar/gzip/curl/jq/kubectl/gawk"` | Nixery.dev image |
 | ephemery.image.tag | string | `"latest"` | Image tag |
 | ephemery.name | string | `"ephemery-init"` | Name of the ephemery container |
-| ephemery.repository | string | `"
-avenbreaks/test-testnet-repos"` | Specify ephemery github repository |
+| ephemery.repository | string | `"avenbreaks/test-testnet-repos"` | Specify ephemery github repository |
 | fullnameOverride | string | `""` | Overrides the chart's computed fullname |
 | geth.image.pullPolicy | string | `"IfNotPresent"` | Container pull policy |
 | geth.image.repository | string | `"ethereum/client-go"` | Container image repository |
